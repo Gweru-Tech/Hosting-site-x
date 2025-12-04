@@ -1,0 +1,44 @@
+services:
+  # Main web service
+  - type: web
+    name: ladybug-hosting-v7
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - fromGroup: ladybug-secrets
+
+  # Background worker for bot management
+  - type: worker
+    name: ladybug-bot-manager
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: node workers/botManager.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - fromGroup: ladybug-secrets
+
+databases:
+  # MongoDB database
+  - name: ladybug-db
+    databaseName: ladybug-hosting-v7
+    user: ladybug-admin
+
+envVarGroups:
+  - name: ladybug-secrets
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: BCRYPT_ROUNDS
+        value: "12"
+      - key: ALLOWED_ORIGINS
+        sync: false

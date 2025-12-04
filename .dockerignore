@@ -1,0 +1,87 @@
+# Node modules
+node_modules
+npm-debug.log
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# Grunt intermediate storage
+.grunt
+
+# Compiled binary addons
+build/Release
+
+# Users Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+CHANGELOG.md
+
+# Tests
+tests
+coverage
+.nyc_output
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+tmp
+temp
+
+# Monitoring
+prometheus_data
+grafana_data
+
+# Render specific
+.render.yaml
+
+# Local development
+.local
+
+# Build artifacts that are not needed in production
+dist
+build
+
+# Package managers
+package-lock.json
+yarn.lock
+
+# Development tools
+.eslintrc*
+.jest*
+.nycrc

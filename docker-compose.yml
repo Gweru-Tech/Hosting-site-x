@@ -1,0 +1,153 @@
+# Ladybug Hosting v7 - Docker Compose Configuration
+version: '3.8'
+
+services:
+  # Main application server
+  ladybug-hosting:
+    build: .
+    container_name: ladybug-hosting-v7
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongodb:27017/ladybug-hosting-v7
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+      - BCRYPT_ROUNDS=12
+      - BOT_HEARTBEAT_INTERVAL=30000
+      - SERVER_HEALTH_CHECK_INTERVAL=60000
+      - LOG_LEVEL=info
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - ladybug-network
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+
+  # Bot management worker
+  ladybug-worker:
+    build: .
+    container_name: ladybug-worker-v7
+    command: node workers/botManager.js
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/ladybug-hosting-v7
+      - BOT_HEARTBEAT_INTERVAL=30000
+      - SERVER_HEALTH_CHECK_INTERVAL=60000
+      - LOG_LEVEL=info
+      - WEBHOOK_URL=http://ladybug-hosting:3000/api/webhooks/bot-status
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - ladybug-network
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+
+  # MongoDB database
+  mongodb:
+    image: mongo:6.0
+    container_name: ladybug-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=ladybug-hosting-v7
+      - MONGO_INITDB_ROOT_USERNAME=ladybug-admin
+      - MONGO_INITDB_ROOT_PASSWORD=secure-password-change-this
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - ladybug-network
+    restart: unless-stopped
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: ladybug-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass secure-redis-password
+    volumes:
+      - redis_data:/data
+    networks:
+      - ladybug-network
+    restart: unless-stopped
+
+  # Nginx reverse proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: ladybug-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./public:/var/www/html:ro
+    depends_on:
+      - ladybug-hosting
+    networks:
+      - ladybug-network
+    restart: unless-stopped
+
+  # Monitoring with Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ladybug-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - ladybug-network
+    restart: unless-stopped
+
+  # Grafana for dashboards (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ladybug-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - ladybug-network
+    restart: unless-stopped
+
+# Networks
+networks:
+  ladybug-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Volumes
+volumes:
+  mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
