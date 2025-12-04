@@ -25,20 +25,20 @@ services:
         value: production
       - fromGroup: ladybug-secrets
 
-databases:
-  # MongoDB database
-  - name: ladybug-db
-    databaseName: ladybug-hosting-v7
-    user: ladybug-admin
+# databases:
+#   # MongoDB database - uncomment if you want to use Render's managed MongoDB
+#   - name: ladybug-db
+#     databaseName: ladybug-hosting-hosting-v7
+#     user: ladybug-admin
 
 envVarGroups:
   - name: ladybug-secrets
     envVars:
       - key: MONGODB_URI
-        sync: false
+        value: "mongodb://localhost:27017/ladybug-hosting-v7"
       - key: JWT_SECRET
         generateValue: true
       - key: BCRYPT_ROUNDS
         value: "12"
       - key: ALLOWED_ORIGINS
-        sync: false
+        value: "https://your-ladybug-site.onrender.com"

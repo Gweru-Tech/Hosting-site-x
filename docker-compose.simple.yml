@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  ladybug-hosting:
+    build: .
+    container_name: ladybug-hosting-v7
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MONGODB_URI=mongodb://localhost:27017/ladybug-hosting-v7
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads

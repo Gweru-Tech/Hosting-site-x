@@ -56,17 +56,6 @@ const BotSchema = new mongoose.Schema({
 
 const Bot = mongoose.model('Bot', BotSchema);
 
-// User Schema
-const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  bots: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Bot' }],
-  createdAt: { type: Date, default: Date.now }
-});
-
-const User = mongoose.model('User', UserSchema);
-
 // Bot Net Server Management
 class BotNetServer {
   constructor() {
@@ -225,13 +214,12 @@ app.use((err, req, res, next) => {
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    mongoose.connection.close(false, () => {
-      console.log('MongoDB connection closed');
-      process.exit(0);
-    });
+  server.close(async () => {
+    await mongoose.connection.close();
+    console.log('MongoDB connection closed');
+    process.exit(0);
   });
 });
 

@@ -13,16 +13,16 @@ RUN apk add --no-cache \
     && rm -rf /var/cache/apk/*
 
 # Copy package files
-COPY package*.json ./
+COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --production && npm cache clean --force
 
 # Copy application code
 COPY . .
 
-# Create logs directory
-RUN mkdir -p logs
+# Create necessary directories
+RUN mkdir -p logs uploads
 
 # Set environment variables
 ENV NODE_ENV=production
@@ -36,12 +36,9 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/api/health || exit 1
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
 
 # Labels
-LABEL maintainer="Ladybug Hosting Team" \
+LABEL maintainer="Ladybug Hosting" \
       version="7.0.0" \
-      description="Ladybug Hosting v7 - Advanced Bot Net Server Platform" \
-      org.opencontainers.image.title="Ladybug Hosting v7" \
-      org.opencontainers.image.version="7.0.0" \
-      org.opencontainers.image.vendor="Ladybug Hosting"
+      description="Ladybug Hosting v7 - Advanced Bot Net Server Platform"
