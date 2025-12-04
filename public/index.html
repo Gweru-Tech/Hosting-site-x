@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐞 Ladybug Hosting v7 - Bot Net Server Management</title>
+    <meta name="description" content="Advanced bot hosting platform with distributed net servers - Version 7">
+    <link rel="stylesheet" href="/css/ladybug-theme.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐞</text></svg>">
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="ladybug-container">
+        <!-- Header -->
+        <header class="ladybug-header">
+            <h1 class="ladybug-title">Ladybug Hosting v7</h1>
+            <p class="ladybug-subtitle">Advanced Bot Net Server Management Platform</p>
+            <nav class="ladybug-nav">
+                <button class="ladybug-btn" onclick="showDashboard()">📊 Dashboard</button>
+                <button class="ladybug-btn secondary" onclick="showBotManager()">🤖 Bot Manager</button>
+                <button class="ladybug-btn secondary" onclick="showServers()">🖥️ Servers</button>
+                <button class="ladybug-btn secondary" onclick="showSettings()">⚙️ Settings</button>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="ladybug-dashboard">
+                <div class="ladybug-card">
+                    <div class="ladybug-card-header">
+                        <h2 class="ladybug-card-title">System Status</h2>
+                        <span class="ladybug-card-icon">🐞</span>
+                    </div>
+                    <div class="ladybug-stats">
+                        <div class="ladybug-stat">
+                            <div class="ladybug-stat-value" id="total-bots">0</div>
+                            <div class="ladybug-stat-label">Total Bots</div>
+                        </div>
+                        <div class="ladybug-stat">
+                            <div class="ladybug-stat-value" id="active-bots">0</div>
+                            <div class="ladybug-stat-label">Active Bots</div>
+                        </div>
+                        <div class="ladybug-stat">
+                            <div class="ladybug-stat-value" id="online-servers">0</div>
+                            <div class="ladybug-stat-label">Online Servers</div>
+                        </div>
+                        <div class="ladybug-stat">
+                            <div class="ladybug-stat-value" id="uptime">0s</div>
+                            <div class="ladybug-stat-label">Uptime</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ladybug-card">
+                    <div class="ladybug-card-header">
+                        <h2 class="ladybug-card-title">Recent Activity</h2>
+                        <span class="ladybug-card-icon">📈</span>
+                    </div>
+                    <ul class="ladybug-list" id="activity-list">
+                        <li class="ladybug-list-item">
+                            <span>System initialized</span>
+                            <span class="ladybug-status online">Ready</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="ladybug-card">
+                    <div class="ladybug-card-header">
+                        <h2 class="ladybug-card-title">Quick Actions</h2>
+                        <span class="ladybug-card-icon">⚡</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="ladybug-btn" onclick="openBotModal()">🚀 Deploy New Bot</button>
+                        <button class="ladybug-btn secondary" onclick="refreshData()">🔄 Refresh Data</button>
+                        <button class="ladybug-btn secondary" onclick="exportData()">📥 Export Logs</button>
+                    </div>
+                </div>
+
+                <div class="ladybug-card">
+                    <div class="ladybug-card-header">
+                        <h2 class="ladybug-card-title">Server Load</h2>
+                        <span class="ladybug-card-icon">💻</span>
+                    </div>
+                    <div id="server-load-chart">
+                        <div style="padding: 20px; text-align: center;">
+                            <div class="ladybug-loading"></div>
+                            <p style="margin-top: 10px; color: var(--ladybug-dark-gray);">Loading server data<span class="ladybug-dots"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bot Manager Section (Hidden by default) -->
+            <section id="bot-manager" style="display: none;">
+                <div class="ladybug-card">
+                    <div class="ladybug-card-header">
+                        <h2 class="ladybug-card-title">Bot Management</h2>
+                        <button class="ladybug-btn" onclick="openBotModal()">+ Add New Bot</button>
+                    </div>
+                    <div id="bot-list-container">
+                        <ul class="ladybug-list" id="bot-list">
+                            <li class="ladybug-list-item">
+                                <span>Loading bots<span class="ladybug-dots"></span></span>
+                                <div class="ladybug-loading"></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Servers Section (Hidden by default) -->
+            <section id="servers" style="display: none;">
+                <div class="ladybug-card">
+                    <div class="ladybug-card-header">
+                        <h2 class="ladybug-card-title">Net Server Status</h2>
+                        <span class="ladybug-card-icon">🖥️</span>
+                    </div>
+                    <div id="servers-list-container">
+                        <ul class="ladybug-list" id="servers-list">
+                            <li class="ladybug-list-item">
+                                <span>Loading servers<span class="ladybug-dots"></span></span>
+                                <div class="ladybug-loading"></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section (Hidden by default) -->
+            <section id="settings" style="display: none;">
+                <div class="ladybug-card">
+                    <div class="ladybug-card-header">
+                        <h2 class="ladybug-card-title">Platform Settings</h2>
+                        <span class="ladybug-card-icon">⚙️</span>
+                    </div>
+                    <form class="ladybug-form" id="settings-form">
+                        <div class="ladybug-form-group">
+                            <label class="ladybug-form-label">Max Bots Per User</label>
+                            <input type="number" class="ladybug-form-input" id="max-bots" value="10" min="1" max="100">
+                        </div>
+                        <div class="ladybug-form-group">
+                            <label class="ladybug-form-label">Heartbeat Interval (ms)</label>
+                            <input type="number" class="ladybug-form-input" id="heartbeat-interval" value="30000" min="5000" max="300000">
+                        </div>
+                        <div class="ladybug-form-group">
+                            <label class="ladybug-form-label">Log Level</label>
+                            <select class="ladybug-form-select" id="log-level">
+                                <option value="debug">Debug</option>
+                                <option value="info" selected>Info</option>
+                                <option value="warn">Warning</option>
+                                <option value="error">Error</option>
+                            </select>
+                        </div>
+                        <div class="ladybug-form-group">
+                            <label class="ladybug-form-label">Notifications</label>
+                            <select class="ladybug-form-select" id="notifications">
+                                <option value="all">All Notifications</option>
+                                <option value="important">Important Only</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="ladybug-btn">💾 Save Settings</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="ladybug-footer">
+            <p class="ladybug-footer-text">
+                🐞 Ladybug Hosting Platform - Advanced Bot Net Server Management
+            </p>
+            <span class="ladybug-version">Version 7.0.0</span>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: var(--ladybug-dark-gray);">
+                Deployed on Render.com | Built with ❤️ and Ladybugs
+            </p>
+        </footer>
+    </div>
+
+    <!-- Bot Modal -->
+    <div id="bot-modal" class="ladybug-modal">
+        <div class="ladybug-modal-content">
+            <button class="ladybug-modal-close" onclick="closeBotModal()">×</button>
+            <h2 style="color: var(--ladybug-red); margin-bottom: 20px;">🚀 Deploy New Bot</h2>
+            <form class="ladybug-form" id="bot-form">
+                <div class="ladybug-form-group">
+                    <label class="ladybug-form-label">Bot Name</label>
+                    <input type="text" class="ladybug-form-input" id="bot-name" required placeholder="Enter bot name">
+                </div>
+                <div class="ladybug-form-group">
+                    <label class="ladybug-form-label">Bot Type</label>
+                    <select class="ladybug-form-select" id="bot-type" required>
+                        <option value="">Select bot type</option>
+                        <option value="discord">Discord Bot</option>
+                        <option value="telegram">Telegram Bot</option>
+                        <option value="web">Web Scraper</option>
+                        <option value="monitor">System Monitor</option>
+                        <option value="custom">Custom Bot</option>
+                    </select>
+                </div>
+                <div class="ladybug-form-group">
+                    <label class="ladybug-form-label">Configuration (JSON)</label>
+                    <textarea class="ladybug-form-textarea" id="bot-config" placeholder='{"key": "value"}'></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="ladybug-btn secondary" onclick="closeBotModal()">Cancel</button>
+                    <button type="submit" class="ladybug-btn">Deploy Bot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
